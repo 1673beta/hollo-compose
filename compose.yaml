@@ -1,0 +1,44 @@
+services:
+  hollo:
+    image: ghcr.io/fedify-dev/hollo:latest
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgres://user:password@postgres:5432/database"
+      SECRET_KEY: "${SECRET_KEY}"
+      LOG_LEVEL: "${LOG_LEVEL}"
+      BEHIND_PROXY: "${BEHIND_PROXY}"
+      S3_REGION: "${S3_REGION}"
+      S3_BUCKET: "${S3_BUCKET}"
+      ASSET_URL_BASE: "${ASSET_URL_BASE}"
+      S3_ENDPOINT_URL: "${S3_ENDPOINT_URL}"
+      S3_FORCE_PATH_STYLE: "${S3_FORCE_PATH_STYLE}"
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    networks:
+      - internal
+      - external
+
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: database
+    volumes:
+    - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - internal
+      - external
+
+volumes:
+  postgres_data:
+
+networks:
+  internal:
+    internal: true
+  external:
